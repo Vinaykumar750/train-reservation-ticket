@@ -23,23 +23,12 @@ jobs:
 
     - name: Verify WAR file exists
       run: ls -lh target/
-
-    - name: Check the Tomcat Connection
-      env:
-        TOMCAT_USER: ${{ secrets.TOMCAT_USER }}
-        TOMCAT_PASSWORD: ${{ secrets.TOMCAT_PASSWORD }}
-        TOMCAT_HOST: ${{ secrets.TOMCAT_HOST }}
-      run: |
-        curl --fail -u "$TOMCAT_USER:$TOMCAT_PASSWORD" "http://$TOMCAT_HOST:8080/manager/text/list"
-
+      
     - name: Deploy WAR to Tomcat
-      env:
-        TOMCAT_USER: ${{ secrets.TOMCAT_USER }}
-        TOMCAT_PASSWORD: ${{ secrets.TOMCAT_PASSWORD }}
-        TOMCAT_HOST: ${{ secrets.TOMCAT_HOST }}
       run: |
-        curl -v -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
-        -T target/TainBook-1.0.0-SNAPSHOT.war \
-        "http://$TOMCAT_HOST:8080/manager/text/deploy?path=/TrainBook&update=true"
+        curl -v -u ${{ secrets.TOMCAT_USER }}:${{ secrets.TOMCAT_PASSWORD }} \
+        -T target/TrainBook-1.0.0-SNAPSHOT.war \
+        "http://${{ secrets.TOMCAT_HOST }}:8080/manager/text/deploy?path=/TrainBook&update=true"
+   
    
 
