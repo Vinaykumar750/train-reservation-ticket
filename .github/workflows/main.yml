@@ -1,37 +1,38 @@
 name: CI/CD Pipeline to Build and Deploy code to Tomcat
+
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
+
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
-   steps:
-   - name: checkout code
-     uses: action/checkout@v3
-   - name: set-up jdk
-     uses: actions/setup-java@v3
-    with:
-       distribution: 'temurin'
-       java-version: '17' #update java version
-   - name: validate with maven
-     run: mvn validate
-   - name: compile with maven
-     run: mvn compile
-   - name: test with maven
-     run: mvn test
-   - name: package with maven
-     run: mvn package
-   - name: verify WAR file 
-    run: ls -lh taget/
-   - name: check the tomcat connection
-     run: |
-            curl --fail -u "${{ secrets.TOMCAT-USER}}:${{ secrets.TOMCAT_PASSWORD }}" \
-            "http://${{ secrets.TOMCAT_HOST }}:8080/manager/text/list"
-  # deply to tomact
-   - name: deploy war to tomcat
-     run: | 
-            curl -v -u ${{ secrets.TOMCAT_USER}}:${{ secrets.TOMCAT_PASSWORD }} \
-            -T target/TainBook-1.0.0-SNAPSHOT.war \
-            "http://{{secrets.TOMCAT_HOST}}:8080/manager/text/deoly?path=/TrainBook&update=true"
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set-up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Build and Package with Maven
+      run: mvn clean package
+
+    - name: Verify WAR file exists
+      run: ls -lh target/
+
+    - name: Check the Tomcat Connection
+      run: |
+        curl --fail -u "${{ secrets.TOMCAT_USER }}:${{ secrets.TOMCAT_PASSWORD }}" \
+        "http://${{ secrets.TOMCAT_HOST }}:8080/manager/text/list"
+
+    - name: Deploy WAR to Tomcat
+      run: |
+        curl -v -u "${{ secrets.TOMCAT_USER }}:${{ secrets.TOMCAT_PASSWORD }}" \
+        -T target/TainBook-1.0.0-SNAPSHOT.war \
+        "http://${{ secrets.TOMCAT_HOST }}:8080/manager/text/deploy?path=/TrainBook&update=true"
    
 
