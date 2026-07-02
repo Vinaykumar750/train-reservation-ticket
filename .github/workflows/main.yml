@@ -1,7 +1,7 @@
 name: Ci pipeline to build the code with maven
 on:
   push:
-  branches: master
+    branches: master
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
