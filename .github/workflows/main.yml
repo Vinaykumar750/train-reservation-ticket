@@ -1,7 +1,7 @@
-name: Ci pipeline to build the code with maven
+name: CI/CD Pipeline to Build and Deploy code to Tomcat
 on:
   push:
-    branches: master
+    branches: ["main"]
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
