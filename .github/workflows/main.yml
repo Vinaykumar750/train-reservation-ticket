@@ -33,6 +33,9 @@ jobs:
         curl -v -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
         -T target/TrainBook-1.0.0-SNAPSHOT.war \
         "http://$TOMCAT_HOST:8080/manager/text/deploy?path=/TrainBook&update=true" 
+
+
+        
     
 
 
