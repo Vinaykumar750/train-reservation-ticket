@@ -1,4 +1,4 @@
-name: CI/CD Pipeline to Build and Deploy to Tomcat
+name: Build and Deploy to Tomcat
 
 on:
   push:
@@ -10,27 +10,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Build and Package
+      - name: Build WAR
         run: mvn clean package
 
-      - name: Verify WAR file
+      - name: Verify WAR File
         run: ls -lh target/
 
-      - name: Deploy WAR to Tomcat
+      - name: Deploy to Tomcat
         env:
+          TOMCAT_HOST: ${{ secrets.TOMCAT_HOST_URL }}
           TOMCAT_USER: ${{ secrets.TOMCAT_USER }}
           TOMCAT_PASSWORD: ${{ secrets.TOMCAT_PASSWORD }}
-          TOMCAT_HOST: ${{ secrets.TOMCAT_HOST_URL }}
         run: |
-          curl -v -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
-            --upload-file target/TrainBook-1.0.0-SNAPSHOT.war \
+          WAR_FILE=$(find target -name "*.war" | head -n 1)
+          echo "WAR file: $WAR_FILE"
+
+          curl -v \
+            -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
+            --upload-file "$WAR_FILE" \
             "http://$TOMCAT_HOST:8080/manager/text/deploy?path=/TrainBook&update=true"
