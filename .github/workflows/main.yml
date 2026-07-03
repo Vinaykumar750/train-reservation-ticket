@@ -27,9 +27,9 @@ jobs:
 
       - name: Deploy to Tomcat
         env:
-          TOMCAT_HOST: ${{ secrets.TOMCAT_HOST_URL }}
-          TOMCAT_USER: ${{ secrets.TOMCAT_USER }}
-          TOMCAT_PASSWORD: ${{ secrets.TOMCAT_PASSWORD }}
+          TOMCAT_HOST: ${{secrets.TOMCAT_HOST}}
+          TOMCAT_USER: ${{secrets.TOMCAT_USER}}
+          TOMCAT_PASSWORD: ${{secrets.TOMCAT_PASSWORD}}
         run: |
           WAR_FILE=$(find target -name "*.war" | head -n 1)
           echo "WAR file: $WAR_FILE"
