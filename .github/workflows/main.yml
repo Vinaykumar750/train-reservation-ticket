@@ -1,45 +1,43 @@
-name: CI/CD Pipeline to Build and Deploy code to Tomcat
+name: CI/CD Pipeline to Build and Deploy to Tomcat
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set-up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
 
-    - name: Build and Package with Maven
-      run: mvn clean package
+      - name: Build application
+        run: mvn clean package
 
-    - name: Verify WAR file exists
-      run: ls -lh target/
-      
-    - name: Deploy WAR to Tomcat
-      env:
-        TOMCAT_USER: ${{ secrets.TOMCAT_USER }}
-        TOMCAT_PASSWORD: ${{ secrets.TOMCAT_PASSWORD }}
-        TOMCAT_HOST: ${{ secrets.TOMCAT_HOST_URL}}
-      run: |
-        curl -v -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
-        -T target/TrainBook-1.0.0-SNAPSHOT.war \
-        "http://$TOMCAT_HOST:8080/manager/text/deploy?path=/TrainBook&update=true" 
+      - name: Verify WAR file
+        run: ls -lh target/
 
+      - name: Deploy to Tomcat
+        env:
+          TOMCAT_USER: ${{ secrets.TOMCAT_USER }}
+          TOMCAT_PASSWORD: ${{ secrets.TOMCAT_PASSWORD }}
+          TOMCAT_HOST: ${{ secrets.TOMCAT_HOST_URL }}
+        run: |
+          RESPONSE=$(curl -s -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
+            -T target/TrainBook-1.0.0-SNAPSHOT.war \
+            "http://$TOMCAT_HOST:8080/manager/text/deploy?path=/TrainBook&update=true")
 
-        
-    
+          echo "$RESPONSE"
 
-
-        
-   
-   
-
+          if [[ "$RESPONSE" != OK* ]]; then
+            echo "Tomcat deployment failed"
+            exit 1
+          fi
