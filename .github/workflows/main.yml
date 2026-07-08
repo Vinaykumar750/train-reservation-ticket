@@ -38,3 +38,125 @@ jobs:
             -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
             --upload-file "$WAR_FILE" \
             "http://$TOMCAT_HOST:8080/manager/text/deploy?path=/TrainBook&update=true"
+
+            
+#-----test-env--------
+ name: Build and Deploy to Tomcat
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build WAR
+        run: mvn clean package
+
+      - name: Verify WAR File
+        run: ls -lh target/
+
+      - name: Deploy to Tomcat
+        env:
+          TOMCAT_HOST: ${{secrets.TOMCAT_HOST}}
+          TOMCAT_USER: ${{secrets.TOMCAT_USER}}
+          TOMCAT_PASSWORD: ${{secrets.TOMCAT_PASSWORD}}
+        run: |
+          WAR_FILE=$(find target -name "*.war" | head -n 1)
+          echo "WAR file: $WAR_FILE"
+          curl -v \
+            -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
+            --upload-file "$WAR_FILE" \
+            "http://$TOMCAT_HOST:8080/manager/text/deploy?path=/TrainBook&update=true"
+  #-----pre-pod-----------
+  name: Build and Deploy to Tomcat
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build WAR
+        run: mvn clean package
+
+      - name: Verify WAR File
+        run: ls -lh target/
+
+      - name: Deploy to Tomcat
+        env:
+          TOMCAT_HOST: ${{secrets.TOMCAT_HOST}}
+          TOMCAT_USER: ${{secrets.TOMCAT_USER}}
+          TOMCAT_PASSWORD: ${{secrets.TOMCAT_PASSWORD}}
+        run: |
+          WAR_FILE=$(find target -name "*.war" | head -n 1)
+          echo "WAR file: $WAR_FILE"
+          curl -v \
+            -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
+            --upload-file "$WAR_FILE" \
+            "http://$TOMCAT_HOST:8080/manager/text/deploy?path=/TrainBook&update=true"
+#-----------pod-env----------------------
+name: Build and Deploy to Tomcat
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build WAR
+        run: mvn clean package
+
+      - name: Verify WAR File
+        run: ls -lh target/
+
+      - name: Deploy to Tomcat
+        env:
+          TOMCAT_HOST: ${{secrets.TOMCAT_HOST}}
+          TOMCAT_USER: ${{secrets.TOMCAT_USER}}
+          TOMCAT_PASSWORD: ${{secrets.TOMCAT_PASSWORD}}
+        run: |
+          WAR_FILE=$(find target -name "*.war" | head -n 1)
+          echo "WAR file: $WAR_FILE"
+          curl -v \
+            -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
+            --upload-file "$WAR_FILE" \
+            "http://$TOMCAT_HOST:8080/manager/text/deploy?path=/TrainBook&update=true"
