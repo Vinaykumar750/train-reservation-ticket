@@ -25,136 +25,26 @@ jobs:
       - name: Verify WAR File
         run: ls -lh target/
 
-      - name: Deploy to Tomcat
+      - name: Deploy to All Tomcat Instances One by One
         env:
-          TOMCAT_HOST: ${{secrets.TOMCAT_HOST}}
-          TOMCAT_USER: ${{secrets.TOMCAT_USER}}
-          TOMCAT_PASSWORD: ${{secrets.TOMCAT_PASSWORD}}
+          TOMCAT_USER: ${{ secrets.TOMCAT_USER }}
+          TOMCAT_PASSWORD: ${{ secrets.TOMCAT_PASSWORD }}
+          # This pulls the space-separated list of IPs directly from your secrets
+          TOMCAT_HOSTS: ${{ secrets.TOMCAT_HOSTS }}
         run: |
           WAR_FILE=$(find target -name "*.war" | head -n 1)
           echo "WAR file: $WAR_FILE"
 
-          curl -v \
-            -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
-            --upload-file "$WAR_FILE" \
-            "http://$TOMCAT_HOST:8080/manager/text/deploy?path=/TrainBook&update=true"
-#-----test-env--------
- name: Build and Deploy to Tomcat
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  build-deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-
-      - name: Setup JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Build WAR
-        run: mvn clean package
-
-      - name: Verify WAR File
-        run: ls -lh target/
-
-      - name: Deploy to Tomcat
-        env:
-          TOMCAT_HOST: ${{secrets.TOMCAT_HOST}}
-          TOMCAT_USER: ${{secrets.TOMCAT_USER}}
-          TOMCAT_PASSWORD: ${{secrets.TOMCAT_PASSWORD}}
-        run: |
-          WAR_FILE=$(find target -name "*.war" | head -n 1)
-          echo "WAR file: $WAR_FILE"
-          curl -v \
-            -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
-            --upload-file "$WAR_FILE" \
-            "http://$TOMCAT_HOST:8080/manager/text/deploy?path=/TrainBook&update=true"
-  #-----pre-pod-----------
-name: Build and Deploy to Tomcat
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  build-deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-
-      - name: Setup JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Build WAR
-        run: mvn clean package
-
-      - name: Verify WAR File
-        run: ls -lh target/
-
-      - name: Deploy to Tomcat
-        env:
-          TOMCAT_HOST: ${{secrets.TOMCAT_HOST}}
-          TOMCAT_USER: ${{secrets.TOMCAT_USER}}
-          TOMCAT_PASSWORD: ${{secrets.TOMCAT_PASSWORD}}
-        run: |
-          WAR_FILE=$(find target -name "*.war" | head -n 1)
-          echo "WAR file: $WAR_FILE"
-          curl -v \
-            -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
-            --upload-file "$WAR_FILE" \
-            "http://$TOMCAT_HOST:8080/manager/text/deploy?path=/TrainBook&update=true"
-#-----------pod-env----------------------
-name: Build and Deploy to Tomcat
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  build-deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-
-      - name: Setup JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Build WAR
-        run: mvn clean package
-
-      - name: Verify WAR File
-        run: ls -lh target/
-
-      - name: Deploy to Tomcat
-        env:
-          TOMCAT_HOST: ${{secrets.TOMCAT_HOST}}
-          TOMCAT_USER: ${{secrets.TOMCAT_USER}}
-          TOMCAT_PASSWORD: ${{secrets.TOMCAT_PASSWORD}}
-        run: |
-          WAR_FILE=$(find target -name "*.war" | head -n 1)
-          echo "WAR file: $WAR_FILE"
-          curl -v \
-            -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
-            --upload-file "$WAR_FILE" \
-            "http://$TOMCAT_HOST:8080/manager/text/deploy?path=/TrainBook&update=true"
+          for HOST in $TOMCAT_HOSTS; do
+            echo "---------------------------------------------"
+            echo "Deploying to Tomcat Instance: $HOST"
+            echo "---------------------------------------------"
+            
+            curl -v \
+              -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
+              --upload-file "$WAR_FILE" \
+              "http://$HOST:8080/manager/text/deploy?path=/TrainBook&update=true"
+              
+            echo "Waiting 5 seconds before moving to next instance..."
+            sleep 5
+          done
