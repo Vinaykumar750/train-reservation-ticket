@@ -38,10 +38,7 @@ jobs:
             -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
             --upload-file "$WAR_FILE" \
             "http://$TOMCAT_HOST:8080/manager/text/deploy?path=/TrainBook&update=true"
-
-            
 #-----test-env--------
- 
  name: Build and Deploy to Tomcat
 
 on:
@@ -82,7 +79,7 @@ jobs:
             --upload-file "$WAR_FILE" \
             "http://$TOMCAT_HOST:8080/manager/text/deploy?path=/TrainBook&update=true"
   #-----pre-pod-----------
-  name: Build and Deploy to Tomcat
+name: Build and Deploy to Tomcat
 
 on:
   push:
